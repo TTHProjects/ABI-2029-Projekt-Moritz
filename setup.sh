@@ -11,14 +11,31 @@ echo "Maria-Wächtler Gymnasium"
 echo "================================================"
 echo ""
 
+# 0. Alte Setup-Strukturen bereinigen
+echo "[0/5] Bereinige alte Setup-Strukturen..."
+if [ -f .env ]; then
+  rm -f .env
+  echo "✓ Alte .env entfernt"
+fi
+if [ -f db/database.json ]; then
+  rm -f db/database.json
+  echo "✓ Alte Datenbankdatei entfernt"
+fi
+if [ -d logs ]; then
+  rm -rf logs
+  echo "✓ Alte Logs entfernt"
+fi
+echo "✓ Bereinigung abgeschlossen"
+echo ""
+
 # 1. Dependencies installieren
-echo "[1/4] Installiere npm Dependencies..."
+echo "[1/5] Installiere npm Dependencies..."
 npm install
 echo "✓ npm Dependencies installiert"
 echo ""
 
 # 2. Kryptografisch sichere Keys generieren
-echo "[2/4] Generiere kryptografische Keys..."
+echo "[2/5] Generiere kryptografische Keys..."
 SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 DB_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 echo "✓ SESSION_SECRET: ${SESSION_SECRET:0:16}..."
@@ -26,7 +43,7 @@ echo "✓ DB_ENCRYPTION_KEY: ${DB_ENCRYPTION_KEY:0:16}..."
 echo ""
 
 # 3. Root Admin Konfiguration
-echo "[3/4] Konfiguriere Root Admin..."
+echo "[3/5] Konfiguriere Root Admin..."
 read -p "Root Admin Email: " ROOT_ADMIN_EMAIL
 read -sp "Root Admin Passwort (verborgen): " ROOT_ADMIN_PASSWORD
 echo ""
@@ -43,7 +60,7 @@ echo "✓ Root Admin konfiguriert"
 echo ""
 
 # 4. .env Datei erstellen
-echo "[4/4] Erstelle .env Datei..."
+echo "[4/5] Erstelle .env Datei..."
 cat > .env << EOF
 NODE_ENV=production
 PORT=4011
@@ -64,7 +81,7 @@ echo "✓ .env Datei erstellt"
 echo ""
 
 # 5. Ordnerstruktur erstellen
-echo "Erstelle Ordnerstruktur..."
+echo "[5/5] Erstelle Ordnerstruktur..."
 mkdir -p db
 mkdir -p public/css
 mkdir -p public/js
@@ -72,15 +89,8 @@ mkdir -p public/images
 mkdir -p views
 mkdir -p logs
 
-# Initialisiere leere Datenbank
-cat > db/database.json << 'EOF'
-{
-  "users": [],
-  "events": [],
-  "payments": [],
-  "news": []
-}
-EOF
+# WICHTIG: Keine Klartext-Datenbank anlegen.
+# Die verschlüsselte DB wird beim ersten Serverstart automatisch erstellt.
 
 echo "✓ Ordnerstruktur erstellt"
 echo ""
