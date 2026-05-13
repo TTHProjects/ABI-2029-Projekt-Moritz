@@ -43,21 +43,55 @@ const fs = require('fs');
 const dbPath = process.env.DB_PATH || './db/database.json';
 let database = {};
 
+function createEmptyDatabase() {
+  return {
+    users: [],
+    events: [],
+    payments: [],
+    news: []
+  };
+}
+
+function backupCorruptDatabaseFile(filePath) {
+  const backupPath = `${filePath}.corrupt-${Date.now()}`;
+  fs.renameSync(filePath, backupPath);
+  console.warn(`⚠️ Defekte Datenbank gesichert unter: ${backupPath}`);
+}
+
 // Initialisiere Datenbank (verschlüsselt im Ruhezustand)
 try {
   const encryption = new DatabaseEncryption(process.env.DB_ENCRYPTION_KEY);
   
   if (fs.existsSync(dbPath)) {
-    database = encryption.readEncryptedFile(dbPath);
-    console.log('✓ Verschlüsselte Datenbank geladen');
+    try {
+      database = encryption.readEncryptedFile(dbPath);
+      console.log('✓ Verschlüsselte Datenbank geladen');
+    } catch (readError) {
+      const raw = fs.readFileSync(dbPath, 'utf8');
+
+      // Migration: alte Klartext-JSON-Datei in verschlüsselte DB umwandeln
+      try {
+        const parsed = JSON.parse(raw);
+        const migrated = {
+          users: Array.isArray(parsed.users) ? parsed.users : [],
+          events: Array.isArray(parsed.events) ? parsed.events : [],
+          payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+          news: Array.isArray(parsed.news) ? parsed.news : []
+        };
+        database = migrated;
+        encryption.writeEncryptedFile(dbPath, database);
+        console.warn('⚠️ Alte Klartext-Datenbank erkannt und verschlüsselt migriert.');
+      } catch (parseError) {
+        // Weder verschlüsselt noch gültiges JSON: Datei sichern und frisch starten
+        backupCorruptDatabaseFile(dbPath);
+        database = createEmptyDatabase();
+        encryption.writeEncryptedFile(dbPath, database);
+        console.warn('⚠️ Neue verschlüsselte Datenbank erstellt (alte Datei war unlesbar).');
+      }
+    }
   } else {
     // Initialisiere mit leeren Strukturen
-    database = {
-      users: [],
-      events: [],
-      payments: [],
-      news: []
-    };
+    database = createEmptyDatabase();
     encryption.writeEncryptedFile(dbPath, database);
     console.log('✓ Neue Datenbank erstellt');
   }
