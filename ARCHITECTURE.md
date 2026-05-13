@@ -1,0 +1,594 @@
+# 🏗️ ARCHITECTURE - ABI-2029
+
+Technische Architektur und System-Design des ABI-2029 Website-Projekts.
+
+---
+
+## 🎯 Architektur-Übersicht
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      INTERNET / BROWSER                     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                    HTTP/HTTPS (Port 3000)
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│                                                             │
+│                   EXPRESS.JS WEBSERVER                      │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │ Routes / Controllers                                  │ │
+│  │  - POST /login     (Authentication)                   │ │
+│  │  - GET /dashboard  (Dashboard View)                   │ │
+│  │  - GET /admin      (Admin View)                       │ │
+│  │  - GET /logout     (Session Destroy)                  │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                           ▼                                  │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │ Middleware Stack                                      │ │
+│  │  - Express.json() / Express.urlencoded()              │ │
+│  │  - Express.static() (CSS, JS, Images)                 │ │
+│  │  - Express-session (Cookie Management)                │ │
+│  │  - isAuthenticated / isAdmin / isRootAdmin            │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                           ▼                                  │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │ Template Engine (EJS)                                 │ │
+│  │  - index.ejs (zentral für alle Pages)                 │ │
+│  │  - Dynamisches Rendering je nach 'page' Parameter     │ │
+│  │  - Tailwind CSS + Custom Glass-Styles                 │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                           ▼                                  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                     Datenverwaltung
+                           │
+        ┌──────────────────┴──────────────────┐
+        │                                     │
+   ┌────▼─────────────┐           ┌──────────▼───────┐
+   │ In-Memory Cache  │           │ Database Layer   │
+   │  (RAM)           │           │ encryption.js    │
+   │                  │           │                  │
+   │  database = {    │           │ AES-256-GCM      │
+   │    users: [...], │◄──────────┤ Encryption       │
+   │    events: [...] │           │ & Decryption     │
+   │    payments: [..] │           │                  │
+   │    news: [...]   │           │                  │
+   │  }               │           │                  │
+   └────────────────┘           └──────────┬───────┘
+                                           │
+                                  ┌────────▼─────────┐
+                                  │ Persistent DB    │
+                                  │                  │
+                                  │ db/database.json │
+                                  │ (Encrypted)      │
+                                  │                  │
+                                  │ nur zum Lesen    │
+                                  │ beim Start und    │
+                                  │ zum Schreiben     │
+                                  │ bei Änderungen    │
+                                  └──────────────────┘
+```
+
+---
+
+## 📊 Data Flow
+
+### 1. Application Startup
+
+```
+┌─────────────────────────────┐
+│ npm start / npm run dev     │
+└────────────┬────────────────┘
+             │
+             ▼
+┌─────────────────────────────┐
+│ Load Environment Variables  │
+│ (.env file)                 │
+└────────────┬────────────────┘
+             │
+             ▼
+┌─────────────────────────────┐
+│ Initialize DatabaseEncryption │
+│ with DB_ENCRYPTION_KEY      │
+└────────────┬────────────────┘
+             │
+             ▼
+┌─────────────────────────────┐
+│ Check if db/database.json   │
+│ exists                      │
+└────────────┬────────────────┘
+             │
+    ┌────────┴────────┐
+    │                 │
+    ▼ YES             ▼ NO
+┌────────────────┐  ┌──────────────────────┐
+│ Decrypt File   │  │ Initialize Empty DB: │
+│ (AES-256-GCM)  │  │ { users: [], ...}    │
+└────────────────┘  │ Encrypt & Save       │
+    │               └──────────────────────┘
+    │                     │
+    └─────────────┬───────┘
+                  │
+                  ▼
+         ┌──────────────────┐
+         │ Load into RAM    │
+         │ database object  │
+         └──────────────────┘
+                  │
+                  ▼
+         ┌──────────────────┐
+         │ Listen on PORT   │
+         │ Server ready!    │
+         └──────────────────┘
+```
+
+---
+
+### 2. User Login Flow
+
+```
+┌─────────────────────────────────┐
+│ User: GET /login                │
+└────────────┬────────────────────┘
+             │
+             ▼
+    ┌────────────────────┐
+    │ Render Login Form  │
+    │ (EJS: page='login')│
+    └────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│ User: POST /login               │
+│ { email, password }             │
+└────────────┬────────────────────┘
+             │
+             ▼
+        ┌────────────────────────┐
+        │ Is Root Admin Email?   │
+        └────────┬──────┬────────┘
+                 │      │
+        ┌────────┘      └────────┐
+        │ YES                    │ NO
+        ▼                        ▼
+   ┌─────────────┐    ┌──────────────────┐
+   │ Check against│    │ Find in DB users │
+   │ bcrypt hash  │    │ array (in RAM)   │
+   │ .env var     │    │                  │
+   └──────┬───────┘    └────────┬─────────┘
+          │                     │
+    ┌─────▼──────┬──────────┬──┴─────┐
+    │ MATCH      │ NO MATCH │ MATCH  │ NO MATCH
+    │            │          │        │
+    ▼            ▼          ▼        ▼
+  ┌────────┐  ┌──────┐  ┌────────┐ ┌──────┐
+  │ Set    │  │Render│  │ Check  │ │Render│
+  │Session │  │Login │  │approved│ │Login │
+  │cookie  │  │with  │  │ flag   │ │Error │
+  │        │  │Error │  └───┬────┘ └──────┘
+  └───┬────┘  └──────┘      │
+      │                 ┌───┴────┐
+      │                 │ YES NO │
+      │                 ▼    ▼
+      │            ┌──────┐ ┌──────┐
+      │            │ Set  │ │Render│
+      │            │Sess. │ │Error │
+      │            └───┬──┘ └──────┘
+      │                │
+      └────────┬───────┘
+               │
+               ▼
+         ┌──────────────┐
+         │ Redirect to  │
+         │ /dashboard   │
+         └──────────────┘
+```
+
+---
+
+### 3. Data Encryption/Decryption
+
+```
+ENCRYPTION (beim Speichern):
+┌────────────────────────┐
+│ JSON Object            │
+│ { users: [...] }       │
+└──────────┬─────────────┘
+           │
+           ▼
+    ┌─────────────────┐
+    │ JSON.stringify()│
+    └────────┬────────┘
+             │
+             ▼
+    ┌──────────────────────┐
+    │ AES-256-GCM Encrypt  │
+    │ • Generate random IV │
+    │ • Encrypt plaintext  │
+    │ • Get AuthTag        │
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │ Concatenate:         │
+    │ IV + AuthTag + Data  │
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │ Convert to Base64    │
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │ Write to Disk        │
+    │ db/database.json     │
+    └──────────────────────┘
+
+
+DECRYPTION (beim Laden):
+┌──────────────────────┐
+│ Read from Disk       │
+│ db/database.json     │
+└──────────┬───────────┘
+           │
+           ▼
+    ┌─────────────────┐
+    │ Decode Base64   │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────────────┐
+    │ Extract Components:     │
+    │ • IV (16 bytes)         │
+    │ • AuthTag (16 bytes)    │
+    │ • Ciphertext (rest)     │
+    └────────┬────────────────┘
+             │
+             ▼
+    ┌──────────────────────┐
+    │ AES-256-GCM Decrypt  │
+    │ • Set AuthTag        │
+    │ • Decrypt ciphertext │
+    │ • Verify authenticity│
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │ JSON.parse()         │
+    │ Get JavaScript object│
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │ Load into RAM        │
+    │ database variable    │
+    └──────────────────────┘
+```
+
+---
+
+## 🗄️ Database Schema
+
+```
+database.json (encrypted on disk):
+├── users[]
+│   ├── id: string (user_<timestamp>)
+│   ├── email: string
+│   ├── name: string
+│   ├── passwordHash: string (bcrypt)
+│   ├── role: string ("user"|"kasse"|"planung"|"admin")
+│   ├── approved: boolean
+│   └── createdAt: ISO8601 timestamp
+│
+├── events[]
+│   ├── id: string
+│   ├── title: string
+│   ├── date: date string
+│   ├── description: string
+│   ├── location: string (optional)
+│   ├── attendees: string[] (user IDs)
+│   ├── createdBy: string (user ID)
+│   └── createdAt: ISO8601 timestamp
+│
+├── payments[]
+│   ├── id: string
+│   ├── userId: string
+│   ├── amount: number (EUR)
+│   ├── paid: boolean
+│   ├── date: ISO8601 timestamp
+│   └── approvedBy: string (user ID of admin)
+│
+└── news[]
+    ├── id: string
+    ├── title: string
+    ├── content: string (HTML safe)
+    ├── createdBy: string (user ID)
+    ├── createdAt: ISO8601 timestamp
+    └── updatedAt: ISO8601 timestamp
+```
+
+---
+
+## 🔄 Session Management
+
+```
+┌──────────────────────────────┐
+│ Browser Cookies              │
+│                              │
+│ connect.sid=s%3A...          │
+│ • HttpOnly: true             │
+│ • Secure: true (HTTPS)       │
+│ • SameSite: Strict           │
+│ • MaxAge: 24 hours           │
+└──────────────┬───────────────┘
+               │
+               ▼ (jeder Request)
+        ┌─────────────────┐
+        │ Express-Session │
+        │ Middleware      │
+        └────────┬────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │ Match connect.id│
+        │ in Store        │
+        └────────┬────────┘
+                 │
+           ┌─────▼─────┐
+           │ FOUND      │ NOT FOUND
+           ▼            ▼
+   ┌──────────────┐  ┌────────────┐
+   │ Load session │  │ New session│
+   │ req.session  │  │ (if POST)  │
+   └──────┬───────┘  └────────────┘
+          │
+          ▼
+   ┌──────────────┐
+   │ req.session  │
+   │ available in │
+   │ all handlers │
+   └──────────────┘
+```
+
+---
+
+## 🔐 Authentication Flow
+
+```
+┌─────────────────────────────┐
+│ Anonymous User              │
+│ (no session)                │
+└──────────────┬──────────────┘
+               │
+               ▼
+        ┌─────────────────┐
+        │ POST /login     │
+        │ email, password │
+        └────────┬────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │ Validate Input  │
+        │ & Find User     │
+        └────────┬────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │ Bcrypt Compare  │
+        │ password vs hash│
+        └────────┬────────┘
+                 │
+            ┌────┴────┐
+            │ MATCH   │ MISMATCH
+            ▼         ▼
+      ┌──────────┐ ┌────────────┐
+      │Create    │ │ Render     │
+      │Session   │ │ Login Form │
+      │set:      │ │ with Error │
+      │• user id │ └────────────┘
+      │• email   │
+      │• role    │
+      │• isRoot  │
+      └────┬─────┘
+           │
+           ▼
+   ┌──────────────────┐
+   │ Set HttpOnly     │
+   │ Cookie           │
+   │ connect.sid      │
+   └────────┬─────────┘
+            │
+            ▼
+   ┌──────────────────┐
+   │ Authenticated    │
+   │ User Ready       │
+   └──────────────────┘
+```
+
+---
+
+## 🚀 Request Processing Pipeline
+
+```
+Request comes in (http://localhost:3000/dashboard)
+            │
+            ▼
+┌───────────────────────────┐
+│ Express Middleware Stack  │
+│ (in order)                │
+├───────────────────────────┤
+│ 1. express.json()         │
+│ 2. express.urlencoded()   │
+│ 3. express.static()       │
+│ 4. express-session        │
+│ 5. Route Handlers         │
+└───────────────────────────┘
+            │
+            ▼
+┌───────────────────────────┐
+│ Check URL Route           │
+│ /dashboard → app.get()    │
+└───────────────────────────┘
+            │
+            ▼
+┌───────────────────────────┐
+│ Apply Middleware:         │
+│ isAuthenticated()         │
+└────────────┬──────────────┘
+             │
+       ┌─────┴─────┐
+       │ LOGGED IN │ NOT LOGGED IN
+       ▼            ▼
+    PROCEED    ┌──────────────┐
+               │ Redirect     │
+               │ to /login    │
+               │ (302)        │
+               └──────────────┘
+    │
+    ▼
+┌───────────────────────────┐
+│ Execute Route Handler     │
+│ • Get user data           │
+│ • Load stats              │
+│ • Prepare view data       │
+└────────────┬──────────────┘
+             │
+             ▼
+┌───────────────────────────┐
+│ Render EJS Template       │
+│ res.render('index', {     │
+│   page: 'dashboard',      │
+│   user: userData,         │
+│   ...                     │
+│ })                        │
+└────────────┬──────────────┘
+             │
+             ▼
+┌───────────────────────────┐
+│ Generate HTML             │
+│ • Liquid Glass Design     │
+│ • Tailwind CSS            │
+│ • Include user data       │
+└────────────┬──────────────┘
+             │
+             ▼
+┌───────────────────────────┐
+│ Send HTTP Response        │
+│ 200 OK + HTML content     │
+│ + Cookies (if needed)     │
+└───────────────────────────┘
+             │
+             ▼
+┌───────────────────────────┐
+│ Browser                   │
+│ • Renders HTML            │
+│ • Loads CSS / JS          │
+│ • Displays Page           │
+└───────────────────────────┘
+```
+
+---
+
+## 📦 Component Breakdown
+
+### 1. **server.js** (800+ Zeilen)
+- Express App Konfiguration
+- Middleware Setup
+- Route Definitions
+- Authentication Logic
+- Error Handling
+
+### 2. **encryption.js** (100+ Zeilen)
+- AES-256-GCM Encryption Class
+- File I/O für verschlüsselte Daten
+- Random IV Generation
+- AuthTag Handling
+
+### 3. **views/index.ejs** (500+ Zeilen)
+- Zentrale Template
+- Login Page (page='login')
+- Dashboard (page='dashboard')
+- Admin Panel (page='admin')
+- Liquid Glass Design
+- Tailwind CSS
+
+### 4. **admin-cli.js** (250+ Zeilen)
+- CLI Tool für Admin-Aufgaben
+- User Management
+- Database Operations
+- Commands: add-user, list-users, approve-user, etc.
+
+### 5. **setup.sh** (100+ Zeilen)
+- Automatisches Setup
+- Key Generation
+- Environment Variables
+- Initial Database Creation
+
+---
+
+## 🔀 File Structure
+
+```
+ABI-2029-Projekt-Moritz/
+├── server.js                # Hauptserver
+├── encryption.js            # Verschlüsselung
+├── admin-cli.js             # Admin CLI Tool
+├── setup.sh                 # Setup Script
+├── start-dev.sh             # Dev Start
+├── test-api.sh              # API Tests
+│
+├── views/
+│   └── index.ejs            # Template
+│
+├── public/                  # Statische Dateien
+│   ├── css/
+│   ├── js/
+│   └── images/
+│
+├── db/
+│   └── database.json        # Verschlüsselt!
+│
+├── logs/                    # Server Logs
+│
+├── documentation/
+│   ├── README.md
+│   ├── INSTALLATION.md
+│   ├── DEVELOPMENT.md
+│   ├── SECURITY.md
+│   ├── API-DOCS.md
+│   ├── ARCHITECTURE.md
+│   └── CHANGELOG.md
+│
+├── package.json
+├── .env                     # Nicht committen!
+├── .env.example             # Template
+├── .gitignore
+└── node_modules/            # Dependencies
+```
+
+---
+
+## 🔄 Version Control Strategy
+
+```
+.gitignore:
+├── .env              ← Umgebungsvariablen (GEHEIM!)
+├── db/               ← Datenbank
+├── node_modules/     ← Dependencies
+├── logs/             ← Server Logs
+└── .DS_Store         ← OS Dateien
+
+Versioned:
+├── server.js         ← Code
+├── encryption.js     ← Code
+├── views/index.ejs   ← Template
+├── package.json      ← Dependencies Liste
+├── README.md         ← Dokumentation
+└── .env.example      ← Template (für neue Dev)
+```
+
+---
+
+**Architektur-Dokumentation v1.0 | ABI-2029**
