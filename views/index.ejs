@@ -4,505 +4,446 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ABI-2029 | Maria-Wächtler Gymnasium</title>
-  
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Custom Styles für Liquid Glass Ästhetik -->
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #0a0f1e;
-      --secondary: #2d0a4e;
-      --accent: #7c3aed;
-      --glass-light: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
-    }
-
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #1a0f2e 50%, #0a0f1e 100%);
-      background-attachment: fixed;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-      color: #e0e0ff;
-      min-height: 100vh;
-    }
-
-    /* Liquid Glass Komponenten */
-    .glass {
-      background: rgba(45, 10, 78, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    }
-
-    .glass-sm {
-      background: rgba(45, 10, 78, 0.1);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-    }
-
-    .glass-hover:hover {
-      background: rgba(45, 10, 78, 0.25);
-      border-color: rgba(255, 255, 255, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .gradient-accent {
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-    }
-
-    .text-gradient {
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-      color: white;
-      padding: 10px 24px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: #e0e0ff;
-      padding: 10px 24px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    input, textarea, select {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e0e0ff;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(124, 58, 237, 0.5);
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-    }
-
-    input::placeholder {
-      color: rgba(224, 224, 255, 0.5);
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(124, 58, 237, 0.3);
-    }
-
-    .navbar {
-      background: rgba(10, 15, 30, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .status-paid {
-      background: rgba(34, 197, 94, 0.2);
-      color: #86efac;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-
-    .status-pending {
-      background: rgba(249, 115, 22, 0.2);
-      color: #fdba74;
-      border: 1px solid rgba(249, 115, 22, 0.3);
-    }
-
-    .status-approved {
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .status-pending-approval {
-      background: rgba(168, 85, 247, 0.2);
-      color: #d8b4fe;
-      border: 1px solid rgba(168, 85, 247, 0.3);
-    }
-
-    .fade-in {
-      animation: fadeIn 0.5s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .alert {
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .alert-error {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .alert-success {
-      background: rgba(34, 197, 94, 0.2);
-      color: #86efac;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-
-    .alert-info {
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #120820 50%, #0a0f1e 100%); background-attachment: fixed; color: #e0e0ff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+    .glass { background: rgba(45,10,78,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; box-shadow: 0 8px 32px rgba(31,38,135,0.3); }
+    .glass-sm { background: rgba(45,10,78,0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; }
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; transition: all 0.25s ease; }
+    .card:hover { background: rgba(255,255,255,0.07); border-color: rgba(124,58,237,0.3); }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding: 8px 18px; border-radius: 9px; border: none; cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: all 0.2s ease; text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; box-shadow: 0 4px 14px rgba(124,58,237,0.35); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,58,237,0.5); }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: #e0e0ff; border: 1px solid rgba(255,255,255,0.15); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+    .btn-danger { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239,68,68,0.35); }
+    .btn-success { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .btn-success:hover { background: rgba(34,197,94,0.35); }
+    .btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+    input, textarea, select { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #e0e0ff; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; width: 100%; transition: all 0.2s ease; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: rgba(124,58,237,0.6); box-shadow: 0 0 0 3px rgba(124,58,237,0.12); background: rgba(255,255,255,0.09); }
+    input::placeholder, textarea::placeholder { color: rgba(224,224,255,0.35); }
+    select option { background: #1a0f2e; color: #e0e0ff; }
+    label { display:block; font-size: 0.8rem; font-weight: 600; color: rgba(224,224,255,0.7); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .text-grad { background: linear-gradient(135deg,#7c3aed,#a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .badge { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-green { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .badge-orange { background: rgba(249,115,22,0.2); color: #fdba74; border: 1px solid rgba(249,115,22,0.3); }
+    .badge-blue { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+    .badge-purple { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+    .badge-red { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: 0.875rem; display:flex; align-items:center; gap:10px; margin-bottom: 16px; }
+    .alert-error   { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+    .alert-success { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding: 10px 14px; border-radius: 9px; color: rgba(224,224,255,0.7); font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: all 0.2s ease; }
+    .sidebar-link:hover { background: rgba(124,58,237,0.2); color: #e0e0ff; }
+    .sidebar-link.active { background: rgba(124,58,237,0.3); color: #e0e0ff; border: 1px solid rgba(124,58,237,0.3); }
+    .table-row { border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .table-row:last-child { border-bottom: none; }
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:50; align-items:center; justify-content:center; padding:20px; }
+    .modal-bg.open { display:flex; }
+    .modal { background: #12082a; border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 28px; width:100%; max-width:440px; }
+    .modal h3 { font-size:1.2rem; font-weight:700; margin-bottom:18px; }
+    .form-row { margin-bottom: 14px; }
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <% if (page !== 'login') { %>
-    <nav class="navbar sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 gradient-accent rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-lg">29</span>
-          </div>
-          <h1 class="text-xl font-bold text-gradient">ABI-2029</h1>
-        </div>
 
-        <div class="flex items-center gap-6">
-          <% if (user) { %>
-            <span class="text-sm text-gray-400">
-              <% if (user.isRootAdmin) { %>
-                👑 Root Admin
-              <% } else { %>
-                <%= user.name || user.email %>
-              <% } %>
-            </span>
-            <a href="/logout" class="btn-secondary text-xs px-3 py-2">
-              Abmelden
-            </a>
-          <% } %>
-        </div>
-      </div>
-    </nav>
-  <% } %>
+<% if (page !== 'login') { %>
+<div style="display:flex;min-height:100vh">
+  <aside style="width:224px;flex-shrink:0;padding:16px;display:flex;flex-direction:column;gap:4px;border-right:1px solid rgba(255,255,255,0.05);background:rgba(10,8,25,0.7)">
+    <div style="display:flex;align-items:center;gap:12px;padding:8px;padding-bottom:20px;margin-bottom:8px">
+      <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:1rem;background:linear-gradient(135deg,#7c3aed,#a855f7)">29</div>
+      <span class="text-grad" style="font-weight:800;font-size:1.1rem">ABI-2029</span>
+    </div>
 
-  <main class="<%= page !== 'login' ? 'py-8' : '' %>">
-    <!-- LOGIN PAGE -->
-    <% if (page === 'login') { %>
-      <div class="min-h-screen flex items-center justify-center px-4">
-        <div class="w-full max-w-md">
-          <!-- Logo & Title -->
-          <div class="text-center mb-8 fade-in">
-            <div class="w-16 h-16 gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span class="text-white font-bold text-4xl">29</span>
-            </div>
-            <h1 class="text-4xl font-bold text-gradient mb-2">ABI-2029</h1>
-            <p class="text-gray-400">Maria-Wächtler Gymnasium</p>
-          </div>
-
-          <!-- Login Form -->
-          <div class="glass p-8 fade-in">
-            <h2 class="text-2xl font-bold mb-6">Login</h2>
-
-            <% if (typeof error !== 'undefined' && error) { %>
-              <div class="alert alert-error mb-4">
-                <span>⚠️</span>
-                <span><%= error %></span>
-              </div>
-            <% } %>
-
-            <form method="POST" action="/login" class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="deine@email.de"
-                  required
-                  class="w-full"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium mb-2">Passwort</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  required
-                  class="w-full"
-                />
-              </div>
-
-              <button type="submit" class="w-full btn-primary mt-6">
-                Anmelden
-              </button>
-            </form>
-
-            <div class="mt-6 pt-6 border-t border-gray-700 text-center text-sm text-gray-400">
-              <p>Noch kein Konto? Kontaktiere einen Administrator.</p>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div class="mt-8 text-center text-xs text-gray-500">
-            <p>🔐 Datensicherheit durch AES-256 Verschlüsselung</p>
-          </div>
-        </div>
-      </div>
-
-    <!-- DASHBOARD PAGE -->
-    <% } else if (page === 'dashboard') { %>
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="mb-8 fade-in">
-          <h1 class="text-4xl font-bold text-gradient mb-2">
-            Willkommen, <%= user.name || 'Schüler' %>!
-          </h1>
-          <p class="text-gray-400">Dein Abitur-Verwaltungs-Dashboard</p>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <!-- Abikassa Status -->
-          <div class="card fade-in hover:scale-105 transform transition-all">
-            <div class="flex justify-between items-start mb-4">
-              <h3 class="text-sm font-semibold text-gray-400">Abikassa</h3>
-              <span class="text-2xl">💰</span>
-            </div>
-            <div class="mb-4">
-              <p class="text-3xl font-bold text-gradient">
-                <%= user.abikassaStatus ? user.abikassaStatus.bezahlt.toFixed(2) : '0.00' %> €
-              </p>
-              <p class="text-xs text-gray-500 mt-1">bezahlt</p>
-            </div>
-            <% if (user.abikassaStatus && user.abikassaStatus.offen > 0) { %>
-              <div class="pt-4 border-t border-gray-700">
-                <p class="text-xs text-orange-400">⚠️ <%= user.abikassaStatus.offen.toFixed(2) %> € ausstehend</p>
-              </div>
-            <% } %>
-          </div>
-
-          <!-- Account Status -->
-          <div class="card fade-in hover:scale-105 transform transition-all">
-            <div class="flex justify-between items-start mb-4">
-              <h3 class="text-sm font-semibold text-gray-400">Status</h3>
-              <span class="text-2xl">✅</span>
-            </div>
-            <% if (user.approved !== false) { %>
-              <span class="status-badge status-approved">Bestätigt</span>
-            <% } else { %>
-              <span class="status-badge status-pending-approval">Ausstehend</span>
-            <% } %>
-            <p class="text-xs text-gray-500 mt-4">
-              Seit: <%= new Date(user.createdAt).toLocaleDateString('de-DE') %>
-            </p>
-          </div>
-
-          <!-- Role -->
-          <div class="card fade-in hover:scale-105 transform transition-all">
-            <div class="flex justify-between items-start mb-4">
-              <h3 class="text-sm font-semibold text-gray-400">Rolle</h3>
-              <span class="text-2xl"><%= user.isRootAdmin ? '👑' : '👤' %></span>
-            </div>
-            <p class="text-lg font-semibold">
-              <% if (user.isRootAdmin) { %>
-                Root Admin
-              <% } else if (user.role === 'admin') { %>
-                Administrator
-              <% } else if (user.role === 'kasse') { %>
-                Kassenwart
-              <% } else if (user.role === 'planung') { %>
-                Planer
-              <% } else { %>
-                Schüler
-              <% } %>
-            </p>
-            <% if (user.isRootAdmin) { %>
-              <a href="/admin" class="text-xs text-purple-400 hover:text-purple-300 mt-2 inline-block">
-                Admin-Panel →
-              </a>
-            <% } %>
-          </div>
-        </div>
-
-        <!-- Events & News -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Upcoming Events -->
-          <div class="glass p-6 fade-in">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-              📅 Kommende Events
-            </h2>
-            <% if (user.events && user.events.length > 0) { %>
-              <div class="space-y-3">
-                <% user.events.forEach(event => { %>
-                  <div class="glass-sm p-3">
-                    <p class="font-semibold"><%= event.title %></p>
-                    <p class="text-xs text-gray-400 mt-1"><%= event.date %></p>
-                  </div>
-                <% }); %>
-              </div>
-            <% } else { %>
-              <p class="text-gray-400 text-sm">Keine Events geplant</p>
-            <% } %>
-          </div>
-
-          <!-- News -->
-          <div class="glass p-6 fade-in">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-              📢 Neuigkeiten
-            </h2>
-            <% if (user.news && user.news.length > 0) { %>
-              <div class="space-y-3">
-                <% user.news.forEach(news => { %>
-                  <div class="glass-sm p-3">
-                    <p class="font-semibold text-sm"><%= news.title %></p>
-                    <p class="text-xs text-gray-500 mt-1"><%= news.date %></p>
-                  </div>
-                <% }); %>
-              </div>
-            <% } else { %>
-              <p class="text-gray-400 text-sm">Keine News</p>
-            <% } %>
-          </div>
-        </div>
-      </div>
-
-    <!-- ADMIN PAGE -->
-    <% } else if (page === 'admin') { %>
-      <div class="max-w-7xl mx-auto px-4">
-        <h1 class="text-4xl font-bold text-gradient mb-8 fade-in">
-          👑 Admin-Panel
-        </h1>
-
-        <!-- Admin Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div class="card fade-in">
-            <p class="text-gray-400 text-sm mb-2">Gesamt User</p>
-            <p class="text-3xl font-bold text-gradient"><%= stats.userCount %></p>
-          </div>
-          <div class="card fade-in">
-            <p class="text-gray-400 text-sm mb-2">Events</p>
-            <p class="text-3xl font-bold text-gradient"><%= stats.eventCount %></p>
-          </div>
-          <div class="card fade-in">
-            <p class="text-gray-400 text-sm mb-2">Gesamteinkünfte</p>
-            <p class="text-3xl font-bold text-gradient"><%= stats.totalPayments %> €</p>
-          </div>
-          <div class="card fade-in">
-            <p class="text-gray-400 text-sm mb-2">System</p>
-            <p class="text-sm text-green-400 font-semibold">🟢 Online</p>
-          </div>
-        </div>
-
-        <!-- Admin Sections -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="glass p-6 fade-in">
-            <h2 class="text-xl font-bold mb-4">👥 User-Verwaltung</h2>
-            <p class="text-gray-400 mb-4">Verwalte Benutzer, Rollen und Zugriffsrechte</p>
-            <button class="btn-primary">User-Verwaltung öffnen</button>
-          </div>
-
-          <div class="glass p-6 fade-in">
-            <h2 class="text-xl font-bold mb-4">💰 Kassenverwaltung</h2>
-            <p class="text-gray-400 mb-4">Zahlungen quittieren und Konten verwalten</p>
-            <button class="btn-primary">Kasse öffnen</button>
-          </div>
-
-          <div class="glass p-6 fade-in">
-            <h2 class="text-xl font-bold mb-4">📅 Event-Planung</h2>
-            <p class="text-gray-400 mb-4">Events und Termine erstellen und verwalten</p>
-            <button class="btn-primary">Events verwalten</button>
-          </div>
-
-          <div class="glass p-6 fade-in">
-            <h2 class="text-xl font-bold mb-4">⚙️ System</h2>
-            <p class="text-gray-400 mb-4">Systemeinstellungen und Sicherheit</p>
-            <button class="btn-primary">Einstellungen</button>
-          </div>
-        </div>
-      </div>
-
-    <!-- 404 PAGE -->
-    <% } else if (page === '404') { %>
-      <div class="min-h-screen flex items-center justify-center">
-        <div class="text-center">
-          <h1 class="text-6xl font-bold text-gradient mb-4">404</h1>
-          <p class="text-xl text-gray-400 mb-6">Seite nicht gefunden</p>
-          <a href="/" class="btn-primary">Zurück zur Startseite</a>
-        </div>
-      </div>
-
+    <a href="/dashboard"   class="sidebar-link <%= page==='dashboard'    ? 'active' : '' %>">📊 Dashboard</a>
+    <% if (user && (user.isRootAdmin || user.role==='admin' || user.role==='kasse')) { %>
+    <a href="/admin/kasse"  class="sidebar-link <%= page==='admin-kasse'  ? 'active' : '' %>">💰 Kasse</a>
     <% } %>
-  </main>
+    <% if (user && (user.isRootAdmin || user.role==='admin' || user.role==='planung')) { %>
+    <a href="/admin/events" class="sidebar-link <%= page==='admin-events' ? 'active' : '' %>">📅 Events</a>
+    <a href="/admin/news"   class="sidebar-link <%= page==='admin-news'   ? 'active' : '' %>">📢 News</a>
+    <% } %>
+    <% if (user && (user.isRootAdmin || user.role==='admin')) { %>
+    <a href="/admin/users"  class="sidebar-link <%= page==='admin-users'  ? 'active' : '' %>">👥 Benutzer</a>
+    <% } %>
 
-  <!-- Footer (nur wenn nicht Login) -->
-  <% if (page !== 'login') { %>
-    <footer class="mt-12 py-6 border-t border-gray-800">
-      <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-        <p>🔐 SHADOW-JSON: Hochsichere Abitur-Verwaltungsplattform</p>
-        <p class="mt-2">© 2026 Maria-Wächtler Gymnasium | Abiturjahrgang 2029</p>
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)">
+      <div style="padding:0 8px;margin-bottom:10px">
+        <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= user ? user.email : '' %></p>
+        <p style="font-size:0.78rem;font-weight:600;color:#a78bfa;margin-top:2px">
+          <%= user && user.isRootAdmin ? '👑 Root Admin' : (user ? user.role : '') %>
+        </p>
       </div>
-    </footer>
+      <a href="/logout" class="sidebar-link" style="color:#f87171">🚪 Abmelden</a>
+    </div>
+  </aside>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+    <header style="display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(10,8,25,0.5)">
+      <span style="font-weight:600;font-size:0.875rem;color:rgba(255,255,255,0.7)">
+        <% if (page==='dashboard')    { %>📊 Dashboard
+        <% } else if (page==='admin-users')  { %>👥 Benutzerverwaltung
+        <% } else if (page==='admin-kasse')  { %>💰 Kassenverwaltung
+        <% } else if (page==='admin-events') { %>📅 Eventplanung
+        <% } else if (page==='admin-news')   { %>📢 Newsverwaltung<% } %>
+      </span>
+      <span style="font-size:0.75rem;color:rgba(255,255,255,0.25)">Maria-Wächtler Gymnasium 2029</span>
+    </header>
+    <main style="flex:1;padding:32px;overflow:auto">
+<% } %>
+
+<!-- ===================== LOGIN ===================== -->
+<% if (page === 'login') { %>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px">
+  <div style="width:100%;max-width:400px" class="fade-in">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem;font-weight:900;color:white;background:linear-gradient(135deg,#7c3aed,#a855f7)">29</div>
+      <h1 class="text-grad" style="font-size:2.5rem;font-weight:900;margin-bottom:4px">ABI-2029</h1>
+      <p style="color:rgba(255,255,255,0.35);font-size:0.9rem">Maria-Wächtler Gymnasium</p>
+    </div>
+    <div class="glass" style="padding:32px">
+      <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:20px">Anmelden</h2>
+      <% if (error) { %><div class="alert alert-error">⚠️ <%= error %></div><% } %>
+      <form method="POST" action="/login">
+        <div class="form-row"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="name@example.com" required autofocus></div>
+        <div class="form-row"><label for="password">Passwort</label><input type="password" id="password" name="password" placeholder="••••••••" required></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;padding:12px">Anmelden →</button>
+      </form>
+      <p style="text-align:center;font-size:0.78rem;color:rgba(255,255,255,0.25);margin-top:20px">Noch kein Konto? Wende dich an einen Admin.</p>
+    </div>
+    <p style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.15);margin-top:12px">🔐 AES-256-GCM verschlüsselt</p>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<% } else if (page === 'dashboard') { %>
+<div class="fade-in">
+  <h1 style="font-size:1.8rem;font-weight:900;margin-bottom:4px">
+    Willkommen<% if (user.name) { %>, <span class="text-grad"><%= user.name %></span><% } %>!
+  </h1>
+  <p style="color:rgba(255,255,255,0.35);font-size:0.875rem;margin-bottom:28px">Dein persönliches Abi-Dashboard</p>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px">
+    <div class="card">
+      <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Abikasse – Bezahlt</p>
+      <p class="text-grad" style="font-size:2rem;font-weight:900"><%= paymentInfo.bezahlt.toFixed(2) %> €</p>
+    </div>
+    <div class="card">
+      <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Abikasse – Offen</p>
+      <p style="font-size:2rem;font-weight:900;color:<%= paymentInfo.offen > 0 ? '#fb923c' : '#4ade80' %>"><%= paymentInfo.offen.toFixed(2) %> €</p>
+    </div>
+    <div class="card">
+      <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Meine Rolle</p>
+      <p style="font-size:1.1rem;font-weight:700">
+        <% if (user.isRootAdmin) { %>👑 Root Admin
+        <% } else if (user.role==='admin') { %>🛡️ Admin
+        <% } else if (user.role==='kasse') { %>💰 Kassenwart
+        <% } else if (user.role==='planung') { %>📅 Planung
+        <% } else { %>🎓 Schüler<% } %>
+      </p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="glass" style="padding:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="font-weight:700">📅 Kommende Events</h3>
+        <% if (user.isRootAdmin || user.role==='admin' || user.role==='planung') { %>
+          <a href="/admin/events" class="btn btn-sm btn-secondary">Verwalten</a>
+        <% } %>
+      </div>
+      <% if (events && events.length > 0) { %>
+        <% events.forEach(e => { %>
+          <div class="glass-sm" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <p style="font-weight:600;font-size:0.875rem"><%= e.title %></p>
+              <% if (e.location) { %><p style="font-size:0.75rem;color:rgba(255,255,255,0.4)">📍 <%= e.location %></p><% } %>
+            </div>
+            <span class="badge badge-blue"><%= new Date(e.date).toLocaleDateString('de-DE') %></span>
+          </div>
+        <% }) %>
+      <% } else { %><p style="color:rgba(255,255,255,0.3);font-size:0.875rem">Keine Events geplant.</p><% } %>
+    </div>
+
+    <div class="glass" style="padding:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="font-weight:700">📢 Neuigkeiten</h3>
+        <% if (user.isRootAdmin || user.role==='admin' || user.role==='planung') { %>
+          <a href="/admin/news" class="btn btn-sm btn-secondary">Verwalten</a>
+        <% } %>
+      </div>
+      <% if (news && news.length > 0) { %>
+        <% news.forEach(n => { %>
+          <div class="glass-sm" style="padding:12px;margin-bottom:8px">
+            <p style="font-weight:600;font-size:0.875rem"><%= n.title %></p>
+            <p style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"><%= n.content %></p>
+            <p style="font-size:0.72rem;color:rgba(255,255,255,0.25);margin-top:6px"><%= new Date(n.createdAt).toLocaleDateString('de-DE') %></p>
+          </div>
+        <% }) %>
+      <% } else { %><p style="color:rgba(255,255,255,0.3);font-size:0.875rem">Keine News vorhanden.</p><% } %>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADMIN: USERS ===================== -->
+<% } else if (page === 'admin-users') { %>
+<div class="fade-in">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div>
+      <h1 style="font-size:1.8rem;font-weight:900">👥 Benutzerverwaltung</h1>
+      <p style="color:rgba(255,255,255,0.35);font-size:0.875rem;margin-top:4px"><%= users.length %> Benutzer registriert</p>
+    </div>
+    <button onclick="document.getElementById('modal-add-user').classList.add('open')" class="btn btn-primary">+ Benutzer hinzufügen</button>
+  </div>
+  <% if (flash) { %><div class="alert alert-<%= flash.type==='error'?'error':'success' %>"><%= flash.type==='error'?'⚠️':'✅' %> <%= flash.msg %></div><% } %>
+
+  <div class="glass" style="overflow:hidden">
+    <% if (users.length === 0) { %>
+      <div style="padding:64px;text-align:center;color:rgba(255,255,255,0.25)"><p style="font-size:3rem;margin-bottom:12px">👤</p><p>Noch keine Benutzer.</p></div>
+    <% } else { %>
+      <div style="display:grid;grid-template-columns:1fr 1fr 110px 100px 170px;gap:16px;padding:12px 24px;font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <span>Name / Email</span><span>Erstellt</span><span>Rolle</span><span>Status</span><span></span>
+      </div>
+      <% users.forEach(u => { %>
+        <div class="table-row" style="display:grid;grid-template-columns:1fr 1fr 110px 100px 170px;gap:16px;padding:14px 24px;align-items:center">
+          <div><p style="font-weight:600;font-size:0.875rem"><%= u.name %></p><p style="font-size:0.75rem;color:rgba(255,255,255,0.35)"><%= u.email %></p></div>
+          <p style="font-size:0.78rem;color:rgba(255,255,255,0.35)"><%= new Date(u.createdAt).toLocaleDateString('de-DE') %></p>
+          <form method="POST" action="/admin/users/<%= u.id %>/role">
+            <select name="role" onchange="this.form.submit()" style="padding:5px 8px;font-size:0.78rem;width:auto">
+              <option value="user"    <%= u.role==='user'    ?'selected':'' %>>Schüler</option>
+              <option value="kasse"   <%= u.role==='kasse'   ?'selected':'' %>>Kasse</option>
+              <option value="planung" <%= u.role==='planung' ?'selected':'' %>>Planung</option>
+              <option value="admin"   <%= u.role==='admin'   ?'selected':'' %>>Admin</option>
+            </select>
+          </form>
+          <span class="badge <%= u.approved?'badge-green':'badge-orange' %>"><%= u.approved?'Aktiv':'Ausstehend' %></span>
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+            <% if (!u.approved) { %>
+              <form method="POST" action="/admin/users/<%= u.id %>/approve" style="display:inline">
+                <button type="submit" class="btn btn-sm btn-success">✓ Freigeben</button>
+              </form>
+            <% } %>
+            <form method="POST" action="/admin/users/<%= u.id %>/delete" style="display:inline" onsubmit="return confirm('Benutzer wirklich löschen?')">
+              <button type="submit" class="btn btn-sm btn-danger">✕</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<div id="modal-add-user" class="modal-bg" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>👤 Neuen Benutzer anlegen</h3>
+    <form method="POST" action="/admin/users/add">
+      <div class="form-row"><label>Name</label><input type="text" name="name" placeholder="Max Mustermann" required></div>
+      <div class="form-row"><label>Email</label><input type="email" name="email" placeholder="max@example.com" required></div>
+      <div class="form-row"><label>Passwort</label><input type="password" name="password" placeholder="Temporäres Passwort" required></div>
+      <div class="form-row"><label>Rolle</label>
+        <select name="role">
+          <option value="user">Schüler</option><option value="kasse">Kassenwart</option>
+          <option value="planung">Planung</option><option value="admin">Admin</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:20px">
+        <button type="submit" class="btn btn-primary">Anlegen</button>
+        <button type="button" onclick="document.getElementById('modal-add-user').classList.remove('open')" class="btn btn-secondary">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== ADMIN: KASSE ===================== -->
+<% } else if (page === 'admin-kasse') { %>
+<div class="fade-in">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div>
+      <h1 style="font-size:1.8rem;font-weight:900">💰 Kassenverwaltung</h1>
+    </div>
+    <button onclick="document.getElementById('modal-add-payment').classList.add('open')" class="btn btn-primary">+ Zahlung eintragen</button>
+  </div>
+  <% if (flash) { %><div class="alert alert-<%= flash.type==='error'?'error':'success' %>"><%= flash.type==='error'?'⚠️':'✅' %> <%= flash.msg %></div><% } %>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+    <div class="card"><p style="font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Gesamt Einnahmen</p><p style="font-size:2rem;font-weight:900;color:#4ade80"><%= gesamtBezahlt.toFixed(2) %> €</p></div>
+    <div class="card"><p style="font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Noch ausstehend</p><p style="font-size:2rem;font-weight:900;color:#fb923c"><%= gesamtOffen.toFixed(2) %> €</p></div>
+  </div>
+
+  <% var hasAny = usersWithPayments.some(u => u.payments.length > 0) %>
+  <% if (!hasAny) { %>
+    <div class="glass" style="padding:64px;text-align:center;color:rgba(255,255,255,0.25)"><p style="font-size:3rem;margin-bottom:12px">💰</p><p>Noch keine Zahlungen erfasst.</p></div>
   <% } %>
+  <% usersWithPayments.forEach(u => { %>
+    <% if (u.payments.length > 0) { %>
+    <div class="glass" style="padding:20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div><p style="font-weight:700"><%= u.name %></p><p style="font-size:0.78rem;color:rgba(255,255,255,0.35)"><%= u.email %></p></div>
+        <div><span class="badge badge-green" style="margin-right:6px"><%= u.totalBezahlt.toFixed(2) %> € ✓</span><% if(u.totalOffen>0){ %><span class="badge badge-orange"><%= u.totalOffen.toFixed(2) %> € offen</span><% } %></div>
+      </div>
+      <% u.payments.forEach(p => { %>
+        <div class="glass-sm" style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:0.875rem">
+          <span style="color:rgba(255,255,255,0.65)"><%= p.description || 'Abikasse' %></span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-weight:700"><%= p.amount.toFixed(2) %> €</span>
+            <form method="POST" action="/admin/kasse/<%= p.id %>/toggle" style="display:inline">
+              <button type="submit" class="badge cursor-pointer <%= p.paid?'badge-green':'badge-orange' %>"><%= p.paid?'✓ bezahlt':'○ offen' %></button>
+            </form>
+            <form method="POST" action="/admin/kasse/<%= p.id %>/delete" style="display:inline" onsubmit="return confirm('Zahlung löschen?')">
+              <button type="submit" style="color:rgba(248,113,113,0.5);background:none;border:none;cursor:pointer;font-size:0.875rem">✕</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+    <% } %>
+  <% }) %>
+</div>
+
+<div id="modal-add-payment" class="modal-bg" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>💰 Zahlung eintragen</h3>
+    <form method="POST" action="/admin/kasse/add">
+      <div class="form-row"><label>Schüler</label>
+        <select name="userId" required>
+          <option value="">– auswählen –</option>
+          <% usersWithPayments.forEach(u => { %><option value="<%= u.id %>"><%= u.name %> (<%= u.email %>)</option><% }) %>
+        </select>
+      </div>
+      <div class="form-row"><label>Betrag (€)</label><input type="number" name="amount" step="0.01" min="0.01" placeholder="50.00" required></div>
+      <div class="form-row"><label>Beschreibung</label><input type="text" name="description" placeholder="Abikasse, Abi-Shirt, ..."></div>
+      <div class="form-row"><label>Status</label>
+        <select name="paid">
+          <option value="false">Offen</option><option value="true">Bezahlt</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:20px">
+        <button type="submit" class="btn btn-primary">Eintragen</button>
+        <button type="button" onclick="document.getElementById('modal-add-payment').classList.remove('open')" class="btn btn-secondary">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== ADMIN: EVENTS ===================== -->
+<% } else if (page === 'admin-events') { %>
+<div class="fade-in">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div>
+      <h1 style="font-size:1.8rem;font-weight:900">📅 Eventplanung</h1>
+      <p style="color:rgba(255,255,255,0.35);font-size:0.875rem;margin-top:4px"><%= events.length %> Events</p>
+    </div>
+    <button onclick="document.getElementById('modal-add-event').classList.add('open')" class="btn btn-primary">+ Event erstellen</button>
+  </div>
+  <% if (flash) { %><div class="alert alert-<%= flash.type==='error'?'error':'success' %>"><%= flash.type==='error'?'⚠️':'✅' %> <%= flash.msg %></div><% } %>
+
+  <% if (events.length === 0) { %>
+    <div class="glass" style="padding:64px;text-align:center;color:rgba(255,255,255,0.25)"><p style="font-size:3rem;margin-bottom:12px">📅</p><p>Noch keine Events geplant.</p></div>
+  <% } else { %>
+    <% events.forEach(e => { %>
+      <div class="glass" style="padding:20px;margin-bottom:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+        <div style="display:flex;align-items:flex-start;gap:16px">
+          <div style="text-align:center;border-radius:12px;padding:12px;min-width:56px;background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.3)">
+            <p style="font-size:0.7rem;color:#c4b5fd;font-weight:700"><%= new Date(e.date).toLocaleDateString('de-DE',{month:'short'}).toUpperCase() %></p>
+            <p style="font-size:1.6rem;font-weight:900;color:white"><%= new Date(e.date).getDate() %></p>
+          </div>
+          <div>
+            <p style="font-weight:700;font-size:1rem"><%= e.title %></p>
+            <% if (e.location) { %><p style="font-size:0.875rem;color:rgba(255,255,255,0.45);margin-top:2px">📍 <%= e.location %></p><% } %>
+            <% if (e.description) { %><p style="font-size:0.78rem;color:rgba(255,255,255,0.3);margin-top:6px"><%= e.description %></p><% } %>
+          </div>
+        </div>
+        <form method="POST" action="/admin/events/<%= e.id %>/delete" onsubmit="return confirm('Event löschen?')">
+          <button type="submit" class="btn btn-sm btn-danger">✕ Löschen</button>
+        </form>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div id="modal-add-event" class="modal-bg" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>📅 Neues Event</h3>
+    <form method="POST" action="/admin/events/add">
+      <div class="form-row"><label>Titel</label><input type="text" name="title" placeholder="Abschlussfeier, Abiturball ..." required></div>
+      <div class="form-row"><label>Datum</label><input type="date" name="date" required></div>
+      <div class="form-row"><label>Ort (optional)</label><input type="text" name="location" placeholder="Aula, Mensa ..."></div>
+      <div class="form-row"><label>Beschreibung (optional)</label><textarea name="description" rows="3" placeholder="Details zum Event..."></textarea></div>
+      <div style="display:flex;gap:12px;margin-top:20px">
+        <button type="submit" class="btn btn-primary">Erstellen</button>
+        <button type="button" onclick="document.getElementById('modal-add-event').classList.remove('open')" class="btn btn-secondary">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== ADMIN: NEWS ===================== -->
+<% } else if (page === 'admin-news') { %>
+<div class="fade-in">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div>
+      <h1 style="font-size:1.8rem;font-weight:900">📢 Newsverwaltung</h1>
+      <p style="color:rgba(255,255,255,0.35);font-size:0.875rem;margin-top:4px"><%= newsList.length %> Beiträge</p>
+    </div>
+    <button onclick="document.getElementById('modal-add-news').classList.add('open')" class="btn btn-primary">+ News verfassen</button>
+  </div>
+  <% if (flash) { %><div class="alert alert-<%= flash.type==='error'?'error':'success' %>"><%= flash.type==='error'?'⚠️':'✅' %> <%= flash.msg %></div><% } %>
+
+  <% if (newsList.length === 0) { %>
+    <div class="glass" style="padding:64px;text-align:center;color:rgba(255,255,255,0.25)"><p style="font-size:3rem;margin-bottom:12px">📢</p><p>Noch keine News veröffentlicht.</p></div>
+  <% } else { %>
+    <% newsList.forEach(n => { %>
+      <div class="glass" style="padding:24px;margin-bottom:12px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div style="flex:1">
+            <h3 style="font-weight:700;font-size:1rem;margin-bottom:6px"><%= n.title %></h3>
+            <p style="font-size:0.875rem;color:rgba(255,255,255,0.55);margin-bottom:10px"><%= n.content %></p>
+            <p style="font-size:0.72rem;color:rgba(255,255,255,0.25)">📅 <%= new Date(n.createdAt).toLocaleDateString('de-DE') %> · ✍️ <%= n.createdBy %></p>
+          </div>
+          <form method="POST" action="/admin/news/<%= n.id %>/delete" onsubmit="return confirm('News löschen?')">
+            <button type="submit" class="btn btn-sm btn-danger">✕ Löschen</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div id="modal-add-news" class="modal-bg" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>📢 News verfassen</h3>
+    <form method="POST" action="/admin/news/add">
+      <div class="form-row"><label>Titel</label><input type="text" name="title" placeholder="Wichtige Ankündigung..." required></div>
+      <div class="form-row"><label>Inhalt</label><textarea name="content" rows="5" placeholder="Was gibt es Neues?" required></textarea></div>
+      <div style="display:flex;gap:12px;margin-top:20px">
+        <button type="submit" class="btn btn-primary">Veröffentlichen</button>
+        <button type="button" onclick="document.getElementById('modal-add-news').classList.remove('open')" class="btn btn-secondary">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== ERROR PAGES ===================== -->
+<% } else if (page === '403') { %>
+<div style="display:flex;align-items:center;justify-content:center;min-height:400px" class="fade-in">
+  <div style="text-align:center"><p style="font-size:4rem;margin-bottom:12px">🚫</p><h1 class="text-grad" style="font-size:2rem;font-weight:900;margin-bottom:8px">403</h1><p style="color:rgba(255,255,255,0.4);margin-bottom:20px">Keine Berechtigung.</p><a href="/dashboard" class="btn btn-primary">← Dashboard</a></div>
+</div>
+<% } else if (page === '404') { %>
+<div style="display:flex;align-items:center;justify-content:center;min-height:400px" class="fade-in">
+  <div style="text-align:center"><p style="font-size:4rem;margin-bottom:12px">🔍</p><h1 class="text-grad" style="font-size:2rem;font-weight:900;margin-bottom:8px">404</h1><p style="color:rgba(255,255,255,0.4);margin-bottom:20px">Seite nicht gefunden.</p><a href="/" class="btn btn-primary">← Zurück</a></div>
+</div>
+<% } %>
+
+<% if (page !== 'login') { %>
+    </main>
+  </div>
+</div>
+<% } %>
+
 </body>
 </html>

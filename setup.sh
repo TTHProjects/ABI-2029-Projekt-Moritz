@@ -20,7 +20,7 @@ echo ""
 # 2. Kryptografisch sichere Keys generieren
 echo "[2/4] Generiere kryptografische Keys..."
 SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
-DB_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(16).toString('hex'))")
+DB_ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 echo "✓ SESSION_SECRET: ${SESSION_SECRET:0:16}..."
 echo "✓ DB_ENCRYPTION_KEY: ${DB_ENCRYPTION_KEY:0:16}..."
 echo ""
