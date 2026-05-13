@@ -8,7 +8,7 @@ const path = require('path');
 const DatabaseEncryption = require('./encryption');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4011;
 
 // ============================================================================
 // 1. MIDDLEWARE CONFIGURATION
@@ -185,12 +185,12 @@ function canAdmin(req, res, next) {
   res.status(403).render('index', { page: '403', user: req.session.user });
 }
 function canKasse(req, res, next) {
-  const r = req.session.user?.role;
+  const r = req.session.user ? req.session.user.role : null;
   if (req.session.user && (req.session.user.isRootAdmin || r === 'admin' || r === 'kasse')) return next();
   res.status(403).render('index', { page: '403', user: req.session.user });
 }
 function canPlanung(req, res, next) {
-  const r = req.session.user?.role;
+  const r = req.session.user ? req.session.user.role : null;
   if (req.session.user && (req.session.user.isRootAdmin || r === 'admin' || r === 'planung')) return next();
   res.status(403).render('index', { page: '403', user: req.session.user });
 }

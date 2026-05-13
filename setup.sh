@@ -46,7 +46,7 @@ echo ""
 echo "[4/4] Erstelle .env Datei..."
 cat > .env << EOF
 NODE_ENV=production
-PORT=3000
+PORT=4011
 
 # Root Admin (Hardcoded)
 ROOT_ADMIN_EMAIL=$ROOT_ADMIN_EMAIL
