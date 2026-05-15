@@ -188,6 +188,61 @@ app.get('/logout', (req, res) => {
 });
 
 // ============================================================================
+// REGISTRATION ROUTES
+// ============================================================================
+
+app.get('/register', (req, res) => {
+  if (req.session.user) return res.redirect('/dashboard');
+  res.render('index', { page: 'register', user: null, error: null, success: null });
+});
+
+app.post('/register', (req, res) => {
+  const { name, email, password, passwordConfirm } = req.body;
+  
+  if (!name || !email || !password || !passwordConfirm) {
+    return res.render('index', { page: 'register', user: null, error: 'Alle Felder erforderlich.', success: null });
+  }
+  
+  if (password !== passwordConfirm) {
+    return res.render('index', { page: 'register', user: null, error: 'Passwörter stimmen nicht überein.', success: null });
+  }
+  
+  if (password.length < 6) {
+    return res.render('index', { page: 'register', user: null, error: 'Passwort muss mindestens 6 Zeichen lang sein.', success: null });
+  }
+  
+  // Check ob Email bereits existiert
+  if (database.users.find(u => u.email === email)) {
+    return res.render('index', { page: 'register', user: null, error: 'Diese Email existiert bereits.', success: null });
+  }
+  
+  if (email === process.env.ROOT_ADMIN_EMAIL) {
+    return res.render('index', { page: 'register', user: null, error: 'Diese Email ist dem Root Admin zugeordnet.', success: null });
+  }
+  
+  // Neuer User mit approved: false
+  const newUser = {
+    id: 'user_' + crypto.randomBytes(6).toString('hex'),
+    name,
+    email,
+    passwordHash: bcrypt.hashSync(password, 10),
+    role: 'user',
+    approved: false,
+    createdAt: new Date().toISOString()
+  };
+  
+  database.users.push(newUser);
+  saveDatabase();
+  
+  res.render('index', { 
+    page: 'register', 
+    user: null, 
+    error: null, 
+    success: 'Registrierung erfolgreich! Bitte warte bis ein Admin dein Konto freigegeben hat.' 
+  });
+});
+
+// ============================================================================
 // 5. MAIN ROUTES
 // ============================================================================
 
